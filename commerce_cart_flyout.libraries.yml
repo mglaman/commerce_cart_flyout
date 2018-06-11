@@ -15,3 +15,18 @@ flyout:
     - core/drupalSettings
     - core/backbone
     - core/underscore
+
+add_to_cart:
+  version: VERSION
+  js:
+    js/add-to-cart.js: { }
+    js/models/AddToCart.js: { }
+    js/views/AddToCart.js: { }
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupal
+    - core/drupalSettings
+    - core/backbone
+    - core/underscore
+    - commerce_cart_flyout/flyout
