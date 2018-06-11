@@ -12,7 +12,11 @@
     },
 
     events: {
-      'click .cart-block--offcanvas-cart-table__remove button': 'removeItem'
+      'click .cart-block--offcanvas-cart-table__remove button': 'removeItem',
+      'click .cart--cart-offcanvas__close button': 'closeOffCanvas'
+    },
+    closeOffCanvas: function closeOffCanvas() {
+      Drupal.cartFlyout.flyoutOffcanvasToggle();
     },
     removeItem: function removeItem(e) {
       e.preventDefault();
