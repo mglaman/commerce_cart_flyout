@@ -38,44 +38,20 @@
       this.selectedAttributes[attribute] = value;
     },
     resolveSelectedVariation: function resolveSelectedVariation() {
-      var match = void 0;
-      var selectedVariation = this.selectedVariation;
+      var selectedAttributes = this.selectedAttributes;
       var attributes = this.attributes;
-      var variations = this.variations;
-      while (attributes.length > 0) {
-        _.each(variations, function (variation, i) {
-          match = true;
-          _.each(attributes, function (attribute, k) {
-            var attributeFieldName = 'attribute_' + attribute.id;
-            if (variation.hasOwnProperty(attributeFieldName)) {
-              _.each(attribute.values, function (attributeValue) {
-                debugger;
-                if (variation[attributeFieldName] !== attributeValue.attribute_value_id) {
-                  match = false;
-                }
-              });
-            }
-            if (match) {
-              selectedVariation = variation;
-              return;
-            }
-          });
+      var variations = Object.values(this.variations);
+
+      var selectedVariation = variations.filter(function (variation) {
+        return attributes.every(function (attribute) {
+          var fieldName = 'attribute_' + attribute.id;
+          return variation.hasOwnProperty(fieldName) && variation[fieldName].toString() === selectedAttributes[fieldName].toString();
         });
-        attributes.pop();
-      }
-      this.selectedVariation = selectedVariation;
+      });
+      this.selectedVariation = selectedVariation[0].uuid;
     },
     addToCart: function addToCart() {
-      console.log(this.selectedAttributes);
-      console.log(this.selectedVariation);
       this.resolveSelectedVariation();
-      console.log(this.selectedVariation);
-      console.log({
-        purchased_entity_type: 'commerce_product_variation',
-        purchased_entity_id: this.variations[this.selectedVariation].variation_id,
-        quantity: 1
-      });
-      return;
       var endpoint = Drupal.url('cart/add?_format=json');
       fetch(endpoint, {
         credentials: 'include',

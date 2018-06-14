@@ -30,48 +30,20 @@
       this.selectedAttributes[attribute] = value;
     },
     resolveSelectedVariation() {
-      // What if there was an add to cart endpoint which took the attributes and figured out the purchasable entity
-      // for us?
-      let match;
-      let selectedVariation = this.selectedVariation;
+      let selectedAttributes = this.selectedAttributes;
       let attributes = this.attributes;
-      let variations = this.variations;
-      while (attributes.length > 0) {
-        _.each(variations, (variation, i) => {
-          match = true;
-          _.each(attributes, (attribute, k) => {
-            let attributeFieldName = 'attribute_' + attribute.id;
-            if (variation.hasOwnProperty(attributeFieldName)) {
-              _.each(attribute.values, (attributeValue) => {
-                debugger;
-                if (variation[attributeFieldName] !== attributeValue.attribute_value_id) {
-                  match = false;
-                }
-              })
-            }
-            if (match) {
-              selectedVariation = variation;
-              return;
-            }
-          });
+      let variations = Object.values(this.variations);
+
+      const selectedVariation = variations.filter(variation => {
+        return attributes.every(attribute => {
+          let fieldName = 'attribute_' + attribute.id;
+          return variation.hasOwnProperty(fieldName) && (variation[fieldName].toString() === selectedAttributes[fieldName].toString());
         });
-        attributes.pop()
-      }
-      this.selectedVariation = selectedVariation;
+      });
+      this.selectedVariation = selectedVariation[0].uuid;
     },
     addToCart() {
-      console.log(this.selectedAttributes);
-      console.log(this.selectedVariation);
       this.resolveSelectedVariation();
-      console.log(this.selectedVariation);
-      console.log(
-        {
-          purchased_entity_type: 'commerce_product_variation',
-          purchased_entity_id: this.variations[this.selectedVariation].variation_id,
-          quantity: 1
-        }
-      );
-      return;
       const endpoint = Drupal.url(`cart/add?_format=json`);
       fetch(endpoint, {
         // By default cookies are not passed, and we need the session cookie!
@@ -108,7 +80,6 @@
               '<label class="control-label"><%= label %></label>' +
               '<select name="attribute_<%= attributeId %>" class="form-control">' +
               '<% _.each(attributeValues, function(currentValue, key) { %>' +
-              // '<% debugger; %>' +
               '<option value="<%= currentValue.attribute_value_id %>" <%= (activeValue === currentValue.attribute_value_id) ? \'selected\' : \'\' %>><%= currentValue.name %></option>' +
               '<% }); %>' +
               '</select></div>');
