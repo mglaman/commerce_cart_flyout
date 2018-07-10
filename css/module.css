@@ -1,8 +1,8 @@
-body.navbar-is-static-top .cart-offcanvas {
-    padding-top: 39px;
+body.toolbar-fixed .cart-offcanvas {
+  padding-top: 39px;
 }
-body.navbar-is-static-top.toolbar-tray-open .cart-offcanvas {
-    padding-top: 79px;
+body.toolbar-fixed.toolbar-tray-open .cart-offcanvas {
+  padding-top: 79px;
 }
 
 .cart-offcanvas {
