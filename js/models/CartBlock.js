@@ -42,7 +42,9 @@
       return this.get('links');
     },
     getCarts: function getCarts() {
-      return this.get('carts');
+      return this.get('carts').filter(function (cart) {
+        return cart.order_items.length > 0;
+      });
     }
   });
 })(Backbone, Drupal);

@@ -64,7 +64,7 @@
         return this.get('links');
       },
       getCarts() {
-        return this.get('carts');
+        return this.get('carts').filter((cart) => cart.order_items.length > 0);
       }
     });
 })(Backbone, Drupal);
