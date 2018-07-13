@@ -11,10 +11,12 @@
     selectedAttributes: [],
     variations: {},
     attributes: {},
+    renderedAttributes: {},
     initialize: function initialize() {
       this.selectedVariation = this.model.getDefaultVariation();
       this.variations = this.model.getVariations();
       this.attributes = this.model.getAttributes();
+      this.renderedAttributes = this.model.get('renderedAttributes');
 
       var defaultVariation = this.variations[this.selectedVariation];
       var self = this;
@@ -66,17 +68,16 @@
           quantity: 1
         }])
       }).then(function (res) {}).then(function () {
-        return Drupal.cartFlyout.fetchCarts();
+        Drupal.cartFlyout.fetchCarts();Drupal.cartFlyout.flyoutOffcanvasToggle();
       });
     },
     generateSelect: function generateSelect(attribute) {},
     render: function render() {
-      var _this = this;
-
       var count = Object.keys(this.variations).length;
       if (count === 1) {
         this.$el.html('<div><input name="addToCart" type="submit" value="Add to cart"/></div>');
       } else {
+        var view = this;
         var html = [];
         this.attributes.forEach(function (entry) {
           if (entry.element_type === 'select') {
@@ -85,7 +86,7 @@
               label: entry.label,
               attributeId: entry.id,
               attributeValues: entry.values,
-              activeValue: _this.selectedAttributes[entry.id]
+              activeValue: view.selectedAttributes[entry.id]
             }));
           } else if (entry.element_type === 'radios') {
             var radiosCompiled = _.template('<div class="form-group">' + '<label class="control-label"><%= label %></label>' + '<% _.each(attributeValues, function(currentValue, key) { %>' + '<div class="radio">' + '<label><input type="radio" class="form-radio" name="attribute_<%= attributeId %>" value="<%= currentValue.attribute_value_id %>" <%= (activeValue === currentValue.attribute_value_id) ? \'checked\' : \'\' %>/><%= currentValue.name %></label>' + '</div>' + '<% }); %>' + '</div>');
@@ -93,17 +94,19 @@
               label: entry.label,
               attributeId: entry.id,
               attributeValues: entry.values,
-              activeValue: _this.selectedAttributes[entry.id]
+              activeValue: view.selectedAttributes[entry.id]
             }));
           } else if (entry.element_type === 'commerce_product_rendered_attribute') {
 
-            var _radiosCompiled = _.template('<div class="form-group">' + '<label class="control-label"><%= label %></label>' + '<% _.each(attributeValues, function(currentValue, key) { %>' + '<div class="radio">' + '<label><input type="radio" class="form-radio" name="attribute_<%= attributeId %>" value="<%= currentValue.attribute_value_id %>" <%= (activeValue === currentValue.attribute_value_id) ? \'checked\' : \'\' %>/>' + '<div class="swatch--square" style="background-color: <%= currentValue.field_color.color %>; width: 30px; height: 30px;"></div>' + '</label>' + '</div>' + '<% }); %>' + '</div>');
-            html.push(_radiosCompiled({
+            var _radiosCompiled = _.template('<div class="form-group">' + '<label class="control-label"><%= label %></label>' + '<% _.each(attributeValues, function(currentValue, key) { %>' + '<div class="radio">' + '<label><input type="radio" class="form-radio" name="attribute_<%= attributeId %>" value="<%= currentValue.attribute_value_id %>" <%= (activeValue === currentValue.attribute_value_id) ? \'checked\' : \'\' %>/>' + '<% print (currentValue.output) %>' + '</label>' + '</div>' + '<% }); %>' + '</div>');
+            var debug = {
               label: entry.label,
               attributeId: entry.id,
-              attributeValues: entry.values,
-              activeValue: _this.selectedAttributes[entry.id]
-            }));
+              attributeValues: view.renderedAttributes['attribute_' + entry.id],
+              activeValue: view.selectedAttributes[entry.id]
+            };
+            debugger;
+            html.push(_radiosCompiled(debug));
           }
         });
 

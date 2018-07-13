@@ -10,7 +10,9 @@
     defaults: {
       defaultVariation: '',
       attributes: {},
+      renderedAttributes: {},
       variations: {}
+
     },
     getDefaultVariation: function getDefaultVariation() {
       return this.get('defaultVariation');

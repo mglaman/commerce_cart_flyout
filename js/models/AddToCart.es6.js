@@ -6,7 +6,9 @@
     defaults: /** @lends Drupal.commerceCart.CartBlockModel# */ {
       defaultVariation: '',
       attributes: {},
+      renderedAttributes: {},
       variations: {},
+
     },
     getDefaultVariation() {
       return this.get('defaultVariation');

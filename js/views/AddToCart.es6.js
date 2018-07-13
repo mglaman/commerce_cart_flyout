@@ -4,10 +4,12 @@
     selectedAttributes: [],
     variations: {},
     attributes: {},
+    renderedAttributes: {},
     initialize() {
       this.selectedVariation = this.model.getDefaultVariation();
       this.variations = this.model.getVariations();
       this.attributes = this.model.getAttributes();
+      this.renderedAttributes = this.model.get('renderedAttributes');
 
       const defaultVariation = this.variations[this.selectedVariation];
       const self = this;
@@ -62,8 +64,7 @@
         ] )
       })
         .then((res) => {})
-        // @todo this should just trigger an event.
-        .then(() => Drupal.cartFlyout.fetchCarts());
+        .then(() => {Drupal.cartFlyout.fetchCarts(); Drupal.cartFlyout.flyoutOffcanvasToggle()});
     },
     generateSelect(attribute) {
 
@@ -73,6 +74,7 @@
       if (count === 1) {
         this.$el.html('<div><input name="addToCart" type="submit" value="Add to cart"/></div>');
       } else {
+        const view = this;
         let html = [];
         this.attributes.forEach(entry => {
           if (entry.element_type === 'select') {
@@ -87,7 +89,7 @@
               label: entry.label,
               attributeId: entry.id,
               attributeValues: entry.values,
-              activeValue: this.selectedAttributes[entry.id]
+              activeValue: view.selectedAttributes[entry.id]
             }))
           } else if (entry.element_type === 'radios') {
             let radiosCompiled = _.template('<div class="form-group">' +
@@ -102,7 +104,7 @@
               label: entry.label,
               attributeId: entry.id,
               attributeValues: entry.values,
-              activeValue: this.selectedAttributes[entry.id]
+              activeValue: view.selectedAttributes[entry.id]
             }))
           } else if (entry.element_type === 'commerce_product_rendered_attribute') {
 
@@ -111,17 +113,19 @@
               '<% _.each(attributeValues, function(currentValue, key) { %>' +
               '<div class="radio">' +
               '<label><input type="radio" class="form-radio" name="attribute_<%= attributeId %>" value="<%= currentValue.attribute_value_id %>" <%= (activeValue === currentValue.attribute_value_id) ? \'checked\' : \'\' %>/>' +
-              '<div class="swatch--square" style="background-color: <%= currentValue.field_color.color %>; width: 30px; height: 30px;"></div>' +
+              '<% print (currentValue.output) %>' +
               '</label>' +
               '</div>' +
               '<% }); %>' +
               '</div>');
-            html.push(radiosCompiled({
+            const debug = {
               label: entry.label,
               attributeId: entry.id,
-              attributeValues: entry.values,
-              activeValue: this.selectedAttributes[entry.id]
-            }))
+              attributeValues: view.renderedAttributes['attribute_' + entry.id],
+              activeValue: view.selectedAttributes[entry.id]
+            };
+            debugger;
+            html.push(radiosCompiled(debug))
 
           }
         });
