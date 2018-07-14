@@ -125,6 +125,7 @@ class AddToCart extends FormatterBase implements ContainerFactoryPluginInterface
       '#attached' => [
         'library' => [
           'core/drupalSettings',
+          'commerce_product/rendered-attributes',
           'commerce_cart_flyout/add_to_cart',
         ],
         'drupalSettings' => [
