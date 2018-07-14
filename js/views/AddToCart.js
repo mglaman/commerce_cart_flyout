@@ -26,9 +26,7 @@
       'change select': 'onAttributeChange'
     },
     onAttributeChange: function onAttributeChange(event) {
-      var value = event.target.value;
-      var attribute = event.target.name;
-      this.selectedAttributes[attribute] = value;
+      this.selectedAttributes[event.target.name] = event.target.value;
     },
     addToCart: function addToCart() {
       var selectedVariation = this.model.getResolvedVariation(this.selectedAttributes);

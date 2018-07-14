@@ -19,17 +19,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Serializer\Serializer;
 
 /**
- * Plugin implementation of the 'commerce_cart_flyout_add_to_cart' formatter.
+ * Drop-in replacement for the default add to cart formatter.
  *
  * This is a progessively decoupled add to cart form for Commerce Product.
- *
- * @FieldFormatter(
- *   id = "commerce_cart_flyout_add_to_cart",
- *   label = @Translation("Flyout Add to cart form"),
- *   field_types = {
- *     "entity_reference",
- *   },
- * )
  */
 class AddToCart extends FormatterBase implements ContainerFactoryPluginInterface {
 
@@ -47,6 +39,7 @@ class AddToCart extends FormatterBase implements ContainerFactoryPluginInterface
   protected $renderer;
 
   protected $attributeValueViewBuilder;
+
   protected $attributeValueStorage;
 
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, RouteMatchInterface $route_match, Serializer $serializer, ProductVariationAttributeMapperInterface $attribute_mapper, RendererInterface $renderer) {
@@ -122,6 +115,11 @@ class AddToCart extends FormatterBase implements ContainerFactoryPluginInterface
       'data-langcode' => $langcode,
     ]);
 
+    $add_to_cart_button = ['#theme' => 'commerce_cart_flyout_add_to_cart_button'];
+    $add_to_cart_select = ['#theme' => 'commerce_cart_flyout_add_to_cart_attributes_select'];
+    $add_to_cart_radios = ['#theme' => 'commerce_cart_flyout_add_to_cart_attributes_radios'];
+    $add_to_cart_rendered = ['#theme' => 'commerce_cart_flyout_add_to_cart_attributes_rendered'];
+
     $elements = [];
     $elements[0]['add_to_cart_form'] = [
       '#attached' => [
@@ -137,6 +135,12 @@ class AddToCart extends FormatterBase implements ContainerFactoryPluginInterface
               'attributes' => $this->serializer->normalize(array_values($prepared_attributes)),
               'renderedAttributes' => $rendered_attributes,
             ],
+          ],
+          'theme' => [
+            'commerce_cart_flyout_add_to_cart_button' => $this->renderer->render($add_to_cart_button),
+            'commerce_cart_flyout_add_to_cart_attributes_select' => $this->renderer->render($add_to_cart_select),
+            'commerce_cart_flyout_add_to_cart_attributes_radios' => $this->renderer->render($add_to_cart_radios),
+            'commerce_cart_flyout_add_to_cart_attributes_rendered' => $this->renderer->render($add_to_cart_rendered),
           ],
         ],
       ],

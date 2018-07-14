@@ -1,0 +1,10 @@
+<div class="form-group">
+  <label for="attribute_<%= attributeId %>" class="control-label"><%= label %></label>
+  <select id="attribute_<%= attributeId %>" name="attribute_<%= attributeId %>" class="form-control">
+    <% _.each(attributeValues, function(currentValue, key) { %>
+    <option value="<%= currentValue.attribute_value_id %>" <%= (activeValue === currentValue.attribute_value_id) ? 'selected' : '' %>>
+      <%= currentValue.name %>
+    </option>
+    <% }); %>
+  </select>
+</div>

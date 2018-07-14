@@ -1,0 +1,11 @@
+<div class="form-group">
+  <label class="control-label"><%= label %></label>
+  <% _.each(attributeValues, function(currentValue, key) { %>
+  <div class="radio">
+    <label for="attribute_<%= attributeId %>_<%= currentValue.attribute_value_id %>">
+      <input type="radio" class="form-radio" id="attribute_<%= attributeId %>_<%= currentValue.attribute_value_id %>" name="attribute_<%= attributeId %>" value="<%= currentValue.attribute_value_id %>" <%= (activeValue === currentValue.attribute_value_id) ? 'checked' : '' %>/>
+      <%= currentValue.name %>
+    </label>
+  </div>
+  <% }); %>
+</div>

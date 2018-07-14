@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\commerce_cart_flyout\Plugin\Field\FieldFormatter\AddToCart;
+
 function commerce_cart_flyout_theme() {
   $defaults = ['render element' => 'elements'];
   return [
@@ -8,5 +10,20 @@ function commerce_cart_flyout_theme() {
     'commerce_cart_flyout_offcanvas' => $defaults,
     'commerce_cart_flyout_offcanvas_contents' => $defaults,
     'commerce_cart_flyout_offcanvas_contents_items' => $defaults,
+    'commerce_cart_flyout_add_to_cart_button' => $defaults,
+    'commerce_cart_flyout_add_to_cart_attributes_select' => $defaults,
+    'commerce_cart_flyout_add_to_cart_attributes_radios' => $defaults,
+    'commerce_cart_flyout_add_to_cart_attributes_rendered' => $defaults,
   ];
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ *
+ * Replaces the commerce_price PriceCalculatedFormatter with
+ * the expanded commerce_order one.
+ */
+function commerce_cart_flyout_field_formatter_info_alter(array &$info) {
+  $info['commerce_add_to_cart']['class'] = AddToCart::class;
+  $info['commerce_add_to_cart']['provider'] = 'commerce_cart_flyout';
 }

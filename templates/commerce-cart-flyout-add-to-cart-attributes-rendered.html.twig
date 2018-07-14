@@ -1,0 +1,11 @@
+<div class="product--rendered-attribute fieldgroup form-composite form-item">
+  <div style="width: 100%;"><label><%= label %></label></div>
+  <% _.each(attributeValues, function(currentValue, key) { %>
+  <div class="form-item js-form-item form-type-radio js-form-type-radio">
+    <input type="radio" class="form-radio" name="attribute_<%= attributeId %>" id="attribute_<%= attributeId %>_<%= currentValue.attribute_value_id %>" value="<%= currentValue.attribute_value_id %>" <%= (activeValue === currentValue.attribute_value_id) ? 'checked' : '' %>/>
+    <label class="control-label option" for="attribute_<%= attributeId %>_<%= currentValue.attribute_value_id %>">
+      <% print (currentValue.output) %>
+    </label>
+  </div>
+  <% }); %>
+</div>
