@@ -21,7 +21,7 @@
     },
 
     events: {
-      'click [name="addToCart"]': 'addToCart',
+      'click .form-submit': 'addToCart',
       'change input[type="radio"]': 'onAttributeChange',
       'change select': 'onAttributeChange'
     },
