@@ -7,23 +7,14 @@
 
 (function (Backbone, _, Drupal) {
   Drupal.addToCart.AddToCartView = Backbone.View.extend({
-    selectedVariation: '',
-    selectedAttributes: [],
-    variations: {},
-    attributes: {},
-    renderedAttributes: {},
     initialize: function initialize() {
-      this.selectedVariation = this.model.getDefaultVariation();
-      this.variations = this.model.getVariations();
-      this.attributes = this.model.getAttributes();
-      this.renderedAttributes = this.model.get('renderedAttributes');
+      var _this = this;
 
-      var defaultVariation = this.variations[this.selectedVariation];
-      var self = this;
-      _.each(this.attributes, function (attribute, i) {
+      var defaultVariation = this.model.getVariation(this.model.getDefaultVariation());
+      _.each(this.model.getAttributes(), function (attribute, i) {
         var attributeFieldName = 'attribute_' + attribute.id;
         if (defaultVariation.hasOwnProperty(attributeFieldName)) {
-          self.selectedAttributes[attributeFieldName] = defaultVariation[attributeFieldName];
+          _this.selectedAttributes[attributeFieldName] = defaultVariation[attributeFieldName];
         }
       });
       this.render();
@@ -39,23 +30,9 @@
       var attribute = event.target.name;
       this.selectedAttributes[attribute] = value;
     },
-    resolveSelectedVariation: function resolveSelectedVariation() {
-      var selectedAttributes = this.selectedAttributes;
-      var attributes = this.attributes;
-      var variations = Object.values(this.variations);
-
-      var selectedVariation = variations.filter(function (variation) {
-        return attributes.every(function (attribute) {
-          var fieldName = 'attribute_' + attribute.id;
-          return variation.hasOwnProperty(fieldName) && variation[fieldName].toString() === selectedAttributes[fieldName].toString();
-        });
-      });
-      this.selectedVariation = selectedVariation[0].uuid;
-    },
     addToCart: function addToCart() {
-      this.resolveSelectedVariation();
-      var endpoint = Drupal.url('cart/add?_format=json');
-      fetch(endpoint, {
+      var selectedVariation = this.model.getResolvedVariation(this.selectedAttributes);
+      fetch(Drupal.url('cart/add?_format=json'), {
         credentials: 'include',
         headers: {
           'Accept': 'application/json',
@@ -64,29 +41,28 @@
         method: 'POST',
         body: JSON.stringify([{
           purchased_entity_type: 'commerce_product_variation',
-          purchased_entity_id: this.variations[this.selectedVariation].variation_id,
+          purchased_entity_id: selectedVariation.variation_id,
           quantity: 1
         }])
       }).then(function (res) {}).then(function () {
         Drupal.cartFlyout.fetchCarts();Drupal.cartFlyout.flyoutOffcanvasToggle();
       });
     },
-    generateSelect: function generateSelect(attribute) {},
     render: function render() {
-      var count = Object.keys(this.variations).length;
+      var count = this.model.getVariationCount();
       if (count === 1) {
         this.$el.html('<div><input name="addToCart" type="submit" value="Add to cart"/></div>');
       } else {
         var view = this;
-        var html = [];
-        this.attributes.forEach(function (entry) {
+        var html = ['<div class="attribute-widgets form-group">'];
+        this.model.getAttributes().forEach(function (entry) {
           if (entry.element_type === 'select') {
             var selectCompiled = _.template('<div class="form-group">' + '<label class="control-label"><%= label %></label>' + '<select name="attribute_<%= attributeId %>" class="form-control">' + '<% _.each(attributeValues, function(currentValue, key) { %>' + '<option value="<%= currentValue.attribute_value_id %>" <%= (activeValue === currentValue.attribute_value_id) ? \'selected\' : \'\' %>><%= currentValue.name %></option>' + '<% }); %>' + '</select></div>');
             html.push(selectCompiled({
               label: entry.label,
               attributeId: entry.id,
               attributeValues: entry.values,
-              activeValue: view.selectedAttributes[entry.id]
+              activeValue: view.selectedAttributes['attribute_' + entry.id]
             }));
           } else if (entry.element_type === 'radios') {
             var radiosCompiled = _.template('<div class="form-group">' + '<label class="control-label"><%= label %></label>' + '<% _.each(attributeValues, function(currentValue, key) { %>' + '<div class="radio">' + '<label><input type="radio" class="form-radio" name="attribute_<%= attributeId %>" value="<%= currentValue.attribute_value_id %>" <%= (activeValue === currentValue.attribute_value_id) ? \'checked\' : \'\' %>/><%= currentValue.name %></label>' + '</div>' + '<% }); %>' + '</div>');
@@ -94,26 +70,25 @@
               label: entry.label,
               attributeId: entry.id,
               attributeValues: entry.values,
-              activeValue: view.selectedAttributes[entry.id]
+              activeValue: view.selectedAttributes['attribute_' + entry.id]
             }));
           } else if (entry.element_type === 'commerce_product_rendered_attribute') {
 
-            var _radiosCompiled = _.template('<div class="form-group">' + '<label class="control-label"><%= label %></label>' + '<% _.each(attributeValues, function(currentValue, key) { %>' + '<div class="radio">' + '<label><input type="radio" class="form-radio" name="attribute_<%= attributeId %>" value="<%= currentValue.attribute_value_id %>" <%= (activeValue === currentValue.attribute_value_id) ? \'checked\' : \'\' %>/>' + '<% print (currentValue.output) %>' + '</label>' + '</div>' + '<% }); %>' + '</div>');
-            var debug = {
+            var _radiosCompiled = _.template('<div class="product--rendered-attribute fieldgroup form-composite form-item">' + '<div style="width: 100%;"><label><%= label %></label></div>' + '<% _.each(attributeValues, function(currentValue, key) { %>' + '<div class="form-item js-form-item form-type-radio js-form-type-radio">' + '<input type="radio" class="form-radio" name="attribute_<%= attributeId %>" id="attribute_<%= attributeId %>_<%= currentValue.attribute_value_id %>" value="<%= currentValue.attribute_value_id %>" <%= (activeValue === currentValue.attribute_value_id) ? \'checked\' : \'\' %>/>' + '<label class="control-label option" for="attribute_<%= attributeId %>_<%= currentValue.attribute_value_id %>"><% print (currentValue.output) %></label>' + '</div>' + '<% }); %>' + '</div>');
+            html.push(_radiosCompiled({
               label: entry.label,
               attributeId: entry.id,
-              attributeValues: view.renderedAttributes['attribute_' + entry.id],
-              activeValue: view.selectedAttributes[entry.id]
-            };
-            debugger;
-            html.push(_radiosCompiled(debug));
+              attributeValues: view.model.getRenderedAttribute('attribute_' + entry.id),
+              activeValue: view.selectedAttributes['attribute_' + entry.id]
+            }));
           }
         });
-
-        html.push('<div><input name="addToCart" type="submit" value="Add to cart"/></div>');
+        html.push('</div>');
+        html.push('<div><input class="button btn btn-primary" name="addToCart" type="submit" value="Add to cart"/></div>');
         var compiled = _.template(html.join(''));
         this.$el.html(compiled);
       }
     }
   });
+  Drupal.addToCart.AddToCartView.prototype.selectedAttributes = {};
 })(Backbone, _, Drupal);

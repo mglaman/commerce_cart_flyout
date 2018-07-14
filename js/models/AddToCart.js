@@ -11,8 +11,11 @@
       defaultVariation: '',
       attributes: {},
       renderedAttributes: {},
-      variations: {}
-
+      variations: {},
+      variationCount: 0
+    },
+    initialize: function initialize() {
+      this.set('variationCount', Object.keys(this.get('variations')).length);
     },
     getDefaultVariation: function getDefaultVariation() {
       return this.get('defaultVariation');
@@ -25,6 +28,22 @@
     },
     getVariation: function getVariation(uuid) {
       return this.attributes['variations'][uuid];
+    },
+    getResolvedVariation: function getResolvedVariation(selectedAttributes) {
+      var _this = this;
+
+      return Object.values(this.getVariations()).filter(function (variation) {
+        return _this.getAttributes().every(function (attribute) {
+          var fieldName = 'attribute_' + attribute.id;
+          return variation.hasOwnProperty(fieldName) && variation[fieldName].toString() === selectedAttributes[fieldName].toString();
+        });
+      }).shift();
+    },
+    getVariationCount: function getVariationCount() {
+      return this.get('variationCount');
+    },
+    getRenderedAttribute: function getRenderedAttribute(fieldName) {
+      return this.attributes['renderedAttributes'][fieldName];
     }
   });
 })(Backbone, Drupal);
