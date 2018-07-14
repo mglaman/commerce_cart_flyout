@@ -162,7 +162,7 @@ class AddToCart extends FormatterBase implements ContainerFactoryPluginInterface
   }
 
   protected function getPreparedAttributedByElementType(array $prepared_attributes, $element_type) {
-    return array_filter($prepared_attributes, function (PreparedAttribute $attribute) {
+    return array_filter($prepared_attributes, function (PreparedAttribute $attribute) use ($element_type) {
       return $attribute->getElementType() == $element_type;
     });
   }
