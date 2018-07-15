@@ -18,6 +18,9 @@ flyout:
 
 add_to_cart:
   version: VERSION
+  css:
+    theme:
+      css/add-to-cart.css: { }
   js:
     js/add-to-cart.js: { }
     js/models/AddToCart.js: { }

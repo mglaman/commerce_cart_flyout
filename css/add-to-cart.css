@@ -1,0 +1,4 @@
+/* @todo fix upsteam in commerce */
+.product--rendered-attribute input:checked ~ label.option {
+  border: 1px solid;
+}
