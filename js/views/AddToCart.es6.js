@@ -16,7 +16,14 @@
       'change select': 'onAttributeChange',
     },
     onAttributeChange(event) {
+      Drupal.detachBehaviors();
       this.selectedAttributes[event.target.name] = event.target.value;
+      const selectedVariation = this.model.getResolvedVariation(this.selectedAttributes);
+      const injectedFields = this.model.getInjectedFieldsForVariation(selectedVariation.uuid);
+      Object.values(injectedFields).map(function (injectedField) {
+        $('.' + injectedField.class).html(injectedField.output);
+      });
+      Drupal.attachBehaviors();
     },
     addToCart() {
       const selectedVariation = this.model.getResolvedVariation(this.selectedAttributes);

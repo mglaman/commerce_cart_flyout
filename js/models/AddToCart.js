@@ -11,6 +11,7 @@
       defaultVariation: '',
       attributes: {},
       renderedAttributes: {},
+      injectedFields: {},
       variations: {},
       variationCount: 0
     },
@@ -44,6 +45,9 @@
     },
     getRenderedAttribute: function getRenderedAttribute(fieldName) {
       return this.attributes['renderedAttributes'][fieldName];
+    },
+    getInjectedFieldsForVariation: function getInjectedFieldsForVariation(uuid) {
+      return this.attributes['injectedFields'][uuid];
     }
   });
 })(Backbone, Drupal);

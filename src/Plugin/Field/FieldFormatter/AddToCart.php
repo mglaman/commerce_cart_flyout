@@ -89,6 +89,7 @@ class AddToCart extends FormatterBase implements ContainerFactoryPluginInterface
     // Fake a requirement on the current route so that our Normalizers run.
     $this->routeMatch->getRouteObject()->setRequirement('_cart_api', 'true');
 
+    /** @var \Drupal\commerce_product\Entity\ProductVariationInterface[] $variations */
     $variations = array_reduce(
       $this->variationStorage->loadEnabled($product),
       function ($carry, ProductVariationInterface $variation) {
@@ -108,6 +109,22 @@ class AddToCart extends FormatterBase implements ContainerFactoryPluginInterface
         ];
       }, array_keys($attribute->getValues()));
     }, $this->getPreparedAttributedByElementType($prepared_attributes, 'commerce_product_rendered_attribute'));
+
+    $variation_field_renderer = \Drupal::getContainer()->get('commerce_product.variation_field_renderer');
+    $injected_variation_fields = array_map(
+      function (ProductVariationInterface $variation) use ($variation_field_renderer) {
+        return array_filter(
+          array_map(function ($build) {
+            return [
+              'class' => $build['#ajax_replace_class'],
+              'output' => trim($this->renderer->render($build)),
+            ];
+          }, $variation_field_renderer->renderFields($variation, $this->viewMode)),
+          function ($built) {
+            return !empty($built['output']);
+          });
+      }, $variations
+    );
 
     $element_attributes = new Attribute([
       'data-product' => $product->uuid(),
@@ -135,6 +152,7 @@ class AddToCart extends FormatterBase implements ContainerFactoryPluginInterface
               'variations' => $this->serializer->normalize($variations),
               'attributes' => $this->serializer->normalize(array_values($prepared_attributes)),
               'renderedAttributes' => $rendered_attributes,
+              'injectedFields' => $injected_variation_fields,
             ],
           ],
           'theme' => [
