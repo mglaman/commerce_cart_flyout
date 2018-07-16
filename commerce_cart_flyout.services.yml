@@ -1,0 +1,5 @@
+services:
+  commerce_cart_flyout.normalizer.prepared_attribute:
+    class: Drupal\commerce_cart_flyout\Normalizer\PreparedAttributeNormalizer
+    tags:
+      - { name: normalizer, priority: 10 }
