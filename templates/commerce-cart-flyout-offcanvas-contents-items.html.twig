@@ -4,7 +4,7 @@
         <tr>
             <td class="cart-block--offcanvas-cart-table__title"><%- orderItem.title %></td>
             <td class="cart-block--offcanvas-cart-table__quantity">
-                <input type="number" data-key="<% print(key) %>" value="<% print(parseInt(orderItem.quantity)) %>" style="width: 35px" />
+                <input type="number" data-key="<% print(key) %>" min="0" value="<% print(parseInt(orderItem.quantity)) %>" style="width: 35px" />
             </td>
             <td class="cart-block--offcanvas-cart-table__price"><%= orderItem.total_price.formatted %></td>
             <td class="cart-block--offcanvas-cart-table__remove">

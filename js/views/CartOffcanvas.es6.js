@@ -80,7 +80,7 @@
         },
         onQuantityChange(e) {
           const targetDelta = e.target.dataset.key;
-          const value = e.target.value;
+          const value = (e.target.value >= 1) ? e.target.value : "1.00";
           this.cart.order_items[targetDelta].quantity = parseInt(value);
         },
         onUpdateCart(event) {
