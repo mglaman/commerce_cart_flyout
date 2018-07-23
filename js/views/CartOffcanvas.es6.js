@@ -76,6 +76,7 @@
         events: {
           'change .cart-block--offcanvas-cart-table__quantity input[type="number"]': 'onQuantityChange',
           'blur .cart-block--offcanvas-cart-table__quantity input[type="number"]': 'doUpdateCart',
+          'keypress .cart-block--offcanvas-cart-table__quantity input[type="number"]': 'onKeypress',
           'click .cart-block--offcanvas-contents__update': 'onUpdateCart'
         },
         onQuantityChange(e) {
@@ -86,6 +87,12 @@
         onUpdateCart(event) {
           event.preventDefault();
           this.doUpdateCart();
+        },
+        onKeypress(event) {
+          if (event.keyCode === 13) {
+            // If the enter key was pressed, blur the element so that change and blur events execute.
+            event.target.blur();
+          }
         },
         doUpdateCart() {
           const endpoint = Drupal.url(`cart/${this.cart.order_id}/items?_format=json`);

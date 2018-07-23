@@ -74,6 +74,7 @@
     events: {
       'change .cart-block--offcanvas-cart-table__quantity input[type="number"]': 'onQuantityChange',
       'blur .cart-block--offcanvas-cart-table__quantity input[type="number"]': 'doUpdateCart',
+      'keypress .cart-block--offcanvas-cart-table__quantity input[type="number"]': 'onKeypress',
       'click .cart-block--offcanvas-contents__update': 'onUpdateCart'
     },
     onQuantityChange: function onQuantityChange(e) {
@@ -84,6 +85,11 @@
     onUpdateCart: function onUpdateCart(event) {
       event.preventDefault();
       this.doUpdateCart();
+    },
+    onKeypress: function onKeypress(event) {
+      if (event.keyCode === 13) {
+        event.target.blur();
+      }
     },
     doUpdateCart: function doUpdateCart() {
       var endpoint = Drupal.url('cart/' + this.cart.order_id + '/items?_format=json');
