@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\commerce_cart_flyout\Plugin\Block\CartBlock;
 use Drupal\commerce_cart_flyout\Plugin\Field\FieldFormatter\AddToCart;
 
 function commerce_cart_flyout_theme() {
@@ -26,4 +27,12 @@ function commerce_cart_flyout_theme() {
 function commerce_cart_flyout_field_formatter_info_alter(array &$info) {
   $info['commerce_add_to_cart']['class'] = AddToCart::class;
   $info['commerce_add_to_cart']['provider'] = 'commerce_cart_flyout';
+}
+
+/**
+ * Implements hook_block_alter()
+ */
+function commerce_cart_flyout_block_alter(array &$info) {
+  $info['commerce_cart']['class'] = CartBlock::class;
+  $info['commerce_cart']['provider'] = 'commerce_cart_flyout';
 }
