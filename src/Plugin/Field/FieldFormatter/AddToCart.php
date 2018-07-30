@@ -163,6 +163,13 @@ class AddToCart extends FormatterBase implements ContainerFactoryPluginInterface
     }
     $variations = $this->loadVariations($product);
     $prepared_attributes = $this->attributeMapper->prepareAttributes($default_variation, $variations);
+    $prepared_attributes = array_filter($prepared_attributes, function (PreparedAttribute $prepared_attribute) {
+      // There will always be at least one value, possibly `_none`.
+      // If we have more than one value, allow the prepared attribute. But if
+      // we only have one, do not consider it, if it is the `_none` value.
+      $values = $prepared_attribute->getValues();
+      return (count($values) > 1) || !isset($values['_none']);
+    });
 
     // Fake a requirement on the current route so that our Normalizers run.
     $this->routeMatch->getRouteObject()->setRequirement('_cart_api', 'true');
