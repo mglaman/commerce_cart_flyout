@@ -55,10 +55,16 @@
       data.then(function (res) {
         return res.json();
       }).then(function (json) {
-        var count = 0;
-        for (var i in json) {
-          count += json[i].order_items.length;
-        }
+        var count = json.reduce(function (previousValue, currentValue) {
+          if (drupalSettings.cartFlyout.use_quantity_count) {
+            return previousValue + currentValue.order_items.reduce(function (previousValue, currentValue) {
+              return previousValue + parseInt(currentValue.quantity);
+            }, 0);
+          } else {
+            return previousValue + currentValue.order_items.length;
+          }
+        }, 0);
+
         _.each(Drupal.cartFlyout.models, function (model) {
           model.set('count', count);
           model.set('carts', json);

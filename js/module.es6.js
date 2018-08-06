@@ -51,10 +51,16 @@
       data.then((res) => {
         return res.json();
       }).then((json) => {
-        let count = 0;
-        for (let i in json) {
-          count += json[i].order_items.length;
-        }
+        let count = json.reduce((previousValue, currentValue) => {
+          if (drupalSettings.cartFlyout.use_quantity_count) {
+            return previousValue + currentValue.order_items.reduce(
+              (previousValue, currentValue) => (previousValue + parseInt(currentValue.quantity)), 0
+            );
+          } else {
+            return previousValue + currentValue.order_items.length;
+          }
+        }, 0);
+
         _.each(Drupal.cartFlyout.models, (model) => {
           model.set('count', count);
           model.set('carts', json);

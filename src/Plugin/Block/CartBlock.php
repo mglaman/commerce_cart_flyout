@@ -5,6 +5,7 @@ namespace Drupal\commerce_cart_flyout\Plugin\Block;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Routing\RouteMatchInterface;
@@ -93,6 +94,36 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
   /**
    * {@inheritdoc}
    */
+  public function defaultConfiguration() {
+    return [
+      'use_quantity_count' => FALSE,
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function blockForm($form, FormStateInterface $form_state) {
+    $form = parent::blockForm($form, $form_state);
+    $form['use_quantity_count'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use a accumulative quantity of each item as item count.'),
+      '#description' => $this->t('Instead of counting the unique items in the cart this will show the sum of the quantity for all items in the cart.'),
+      '#default_value' => $this->configuration['use_quantity_count'],
+    ];
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function blockSubmit($form, FormStateInterface $form_state) {
+    $this->configuration['use_quantity_count'] = $form_state->getValue('use_quantity_count');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function build() {
     $this->registryData = $this->themeRegistry->get();
 
@@ -109,6 +140,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
         ],
         'drupalSettings' => [
           'cartFlyout' => [
+            'use_quantity_count' => $this->configuration['use_quantity_count'],
             'templates' => [
               'icon' => $icon_twig->getCode(),
               'block' => $block_twig->getCode(),

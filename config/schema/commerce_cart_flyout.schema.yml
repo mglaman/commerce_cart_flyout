@@ -1,0 +1,7 @@
+block.settings.commerce_cart_flyout:
+  type: block_settings
+  label: 'Cart flyout'
+  mapping:
+    use_quantity_count:
+      type: boolean
+      label: 'Display accumulative quantity of each item as item count.'
