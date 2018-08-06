@@ -2,9 +2,13 @@
 
 namespace Drupal\commerce_cart_flyout\Plugin\Block;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Template\Loader\ThemeRegistryLoader;
 use Drupal\Core\Theme\Registry;
 use Drupal\Core\Url;
@@ -43,6 +47,13 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
   protected $registryData;
 
   /**
+   * The route match.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
+
+  /**
    * Constructs a new CartBlock object.
    *
    * @param array $configuration
@@ -55,11 +66,14 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
    *   The theme registry.
    * @param \Drupal\Core\Template\Loader\ThemeRegistryLoader $theme_registry_loader
    *   The theme registry loader.
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The request stack.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, Registry $registry, ThemeRegistryLoader $theme_registry_loader) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, Registry $registry, ThemeRegistryLoader $theme_registry_loader, RouteMatchInterface $route_match) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->themeRegistry = $registry;
     $this->themeRegistryLoader = $theme_registry_loader;
+    $this->routeMatch = $route_match;
   }
 
   /**
@@ -71,7 +85,8 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
       $plugin_id,
       $plugin_definition,
       $container->get('theme.registry'),
-      $container->get('twig.loader.theme_registry')
+      $container->get('twig.loader.theme_registry'),
+      $container->get('current_route_match')
     );
   }
 
@@ -124,6 +139,22 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
   protected function getSourceContext($theme_hook) {
     $theme_hook_info = $this->registryData[$theme_hook];
     return $this->themeRegistryLoader->getSourceContext($theme_hook_info['template'] . '.html.twig');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function blockAccess(AccountInterface $account) {
+    // Do not allow the cart flyout to render on the checkout form, as this
+    // would allow for modifying the order outside of checkout.
+    return AccessResult::allowedIf($this->routeMatch->getRouteName() != 'commerce_checkout.form');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheContexts() {
+    return Cache::mergeContexts(parent::getCacheContexts(), ['route']);
   }
 
 }
