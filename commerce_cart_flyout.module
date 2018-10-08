@@ -21,8 +21,8 @@ function commerce_cart_flyout_theme() {
 /**
  * Implements hook_field_formatter_info_alter().
  *
- * Replaces the commerce_price PriceCalculatedFormatter with
- * the expanded commerce_order one.
+ * Replaces the commerce_product AddToCartFormatter formatter with
+ * the commerce_cart_flyout one.
  */
 function commerce_cart_flyout_field_formatter_info_alter(array &$info) {
   $info['commerce_add_to_cart']['class'] = AddToCart::class;
@@ -31,6 +31,8 @@ function commerce_cart_flyout_field_formatter_info_alter(array &$info) {
 
 /**
  * Implements hook_block_alter()
+ *
+ * Replaces the commerce_cart CartBlock block with the commerce_cart_flyout one.
  */
 function commerce_cart_flyout_block_alter(array &$info) {
   $info['commerce_cart']['class'] = CartBlock::class;

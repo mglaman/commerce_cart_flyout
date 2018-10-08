@@ -107,7 +107,7 @@ class CartBlock extends BlockBase implements ContainerFactoryPluginInterface {
     $form = parent::blockForm($form, $form_state);
     $form['use_quantity_count'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Use a accumulative quantity of each item as item count.'),
+      '#title' => $this->t('Use an accumulative quantity of each item as item count.'),
       '#description' => $this->t('Instead of counting the unique items in the cart this will show the sum of the quantity for all items in the cart.'),
       '#default_value' => $this->configuration['use_quantity_count'],
     ];
