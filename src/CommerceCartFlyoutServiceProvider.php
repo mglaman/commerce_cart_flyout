@@ -2,11 +2,13 @@
 
 namespace Drupal\commerce_cart_flyout;
 
+use Drupal\commerce_cart_flyout\EventSubscriber\CartEventSubscriber;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Removes the add to cart message.
+ * Replaces the add to cart message.
  */
 class CommerceCartFlyoutServiceProvider extends ServiceProviderBase {
 
@@ -14,10 +16,11 @@ class CommerceCartFlyoutServiceProvider extends ServiceProviderBase {
    * {@inheritdoc}
    */
   public function alter(ContainerBuilder $container) {
-    // Remove the server side add to cart messaging.
-    // @todo Make a way to silence the message without removing definition.
+    // Replace the server side add to cart messaging.
     if ($container->hasDefinition('commerce_cart.cart_subscriber')) {
-      $container->removeDefinition('commerce_cart.cart_subscriber');
+      $definition = $container->getDefinition('commerce_cart.cart_subscriber');
+      $definition->setClass(CartEventSubscriber::class)
+        ->addArgument(new Reference('current_route_match'));
     }
   }
 
