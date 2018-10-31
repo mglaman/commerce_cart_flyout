@@ -27,26 +27,23 @@
     },
     addToCart() {
       const selectedVariation = this.model.getResolvedVariation(this.selectedAttributes);
-      fetch(Drupal.url(`cart/add?_format=json`), {
-        // By default cookies are not passed, and we need the session cookie!
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
+
+      $.ajax({
+        url:Drupal.url(`cart/add?_format=json`),
         method: 'POST',
-        body: JSON.stringify( [
+        data: JSON.stringify([
           {
             purchased_entity_type: 'commerce_product_variation',
             purchased_entity_id: selectedVariation.variation_id,
             quantity: 1
           }
-        ] )
+        ]),
+        contentType: `application/json;`,
+        dataType: `json`,
       })
-        .then((res) => {})
-        .then(() => {
+        .done(() => {
           Drupal.cartFlyout.fetchCarts();
-          Drupal.cartFlyout.flyoutOffcanvasToggle()
+          Drupal.cartFlyout.flyoutOffcanvasToggle();
         });
     },
     render() {

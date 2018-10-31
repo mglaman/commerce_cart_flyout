@@ -5,7 +5,7 @@
 * @preserve
 **/
 
-(function (Backbone, Drupal) {
+(function ($, Backbone, Drupal) {
   Drupal.cartFlyout.CartOffcanvasView = Backbone.View.extend({
     initialize: function initialize() {
       this.listenTo(this.model, 'cartsLoaded', this.render);
@@ -22,10 +22,10 @@
       e.preventDefault();
       var target = JSON.parse(e.currentTarget.value);
       var endpoint = Drupal.url('cart/' + target[0] + '/items/' + target[1] + '?_format=json');
-      fetch(endpoint, {
-        credentials: 'include',
-        method: 'delete'
-      }).then(function (res) {}).then(function () {
+      $.ajax({
+        url: endpoint,
+        method: 'DELETE'
+      }).done(function () {
         return Drupal.cartFlyout.fetchCarts();
       });
     },
@@ -103,16 +103,13 @@
         };
       }
 
-      fetch(endpoint, {
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-
+      $.ajax({
+        url: endpoint,
         method: 'PATCH',
-        body: JSON.stringify(body)
-      }).then(function (res) {}).then(function () {
+        data: JSON.stringify(body),
+        contentType: 'application/json;',
+        dataType: 'json'
+      }).done(function () {
         return Drupal.cartFlyout.fetchCarts();
       });
     },
@@ -126,4 +123,4 @@
       }));
     }
   });
-})(Backbone, Drupal);
+})(jQuery, Backbone, Drupal);

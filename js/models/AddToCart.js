@@ -33,7 +33,9 @@
     getResolvedVariation: function getResolvedVariation(selectedAttributes) {
       var _this = this;
 
-      return Object.values(this.getVariations()).filter(function (variation) {
+      return Object.keys(this.getVariations()).map(function (key) {
+        return _this.getVariation(key);
+      }).filter(function (variation) {
         return _this.getAttributes().every(function (attribute) {
           var fieldName = 'attribute_' + attribute.id;
           return variation.hasOwnProperty(fieldName) && variation[fieldName].toString() === selectedAttributes[fieldName].toString();

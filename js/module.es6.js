@@ -43,14 +43,7 @@
       Drupal.cartFlyout.offcanvasBackground.classList.toggle('is-closed')
     },
     fetchCarts() {
-      // @todo will not work on IE11 w/o a polyfill.
-      let data = fetch(Drupal.url(`cart?_format=json`), {
-        // By default cookies are not passed, and we need the session cookie!
-        credentials: 'include'
-      });
-      data.then((res) => {
-        return res.json();
-      }).then((json) => {
+      $.get(Drupal.url(`cart?_format=json`), json => {
         let count = json.reduce((previousValue, currentValue) => {
           if (drupalSettings.cartFlyout.use_quantity_count) {
             return previousValue + currentValue.order_items.reduce(
@@ -67,7 +60,6 @@
           model.trigger('cartsLoaded', model);
         });
       });
-
     }
   };
   Drupal.behaviors.cartFlyout = {

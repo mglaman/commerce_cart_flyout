@@ -49,12 +49,7 @@
       Drupal.cartFlyout.offcanvasBackground.classList.toggle('is-closed');
     },
     fetchCarts: function fetchCarts() {
-      var data = fetch(Drupal.url('cart?_format=json'), {
-        credentials: 'include'
-      });
-      data.then(function (res) {
-        return res.json();
-      }).then(function (json) {
+      $.get(Drupal.url('cart?_format=json'), function (json) {
         var count = json.reduce(function (previousValue, currentValue) {
           if (drupalSettings.cartFlyout.use_quantity_count) {
             return previousValue + currentValue.order_items.reduce(function (previousValue, currentValue) {

@@ -1,4 +1,4 @@
-((Backbone, Drupal) => {
+(($, Backbone, Drupal) => {
     Drupal.cartFlyout.CartOffcanvasView = Backbone.View.extend(/** @lends Drupal.cartFlyout.CartOffcanvasView# */{
         initialize() {
             this.listenTo(this.model, 'cartsLoaded', this.render);
@@ -14,13 +14,10 @@
           e.preventDefault();
           const target = JSON.parse(e.currentTarget.value);
           const endpoint = Drupal.url(`cart/${target[0]}/items/${target[1]}?_format=json`);
-          fetch(endpoint, {
-            // By default cookies are not passed, and we need the session cookie!
-            credentials: 'include',
-            method: 'delete'
-          })
-            .then((res) => {})
-            .then(() => Drupal.cartFlyout.fetchCarts());
+          $.ajax({
+            url: endpoint,
+            method: 'DELETE'
+          }).done(() => Drupal.cartFlyout.fetchCarts());
         },
         /**
          * @inheritdoc
@@ -106,19 +103,13 @@
             }
           }
 
-          fetch(endpoint, {
-            // By default cookies are not passed, and we need the session cookie!
-            credentials: 'include',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            // Shout PATCH, see https://github.com/github/fetch/issues/254
+          $.ajax({
+            url: endpoint,
             method: 'PATCH',
-            body: JSON.stringify( body )
-          })
-            .then((res) => {})
-            .then(() => Drupal.cartFlyout.fetchCarts());
+            data: JSON.stringify( body ),
+            contentType: `application/json;`,
+            dataType: `json`,
+          }).done(() => Drupal.cartFlyout.fetchCarts());
         },
         /**
          * @inheritdoc
@@ -133,4 +124,4 @@
           }));
         },
       });
-})(Backbone, Drupal);
+})(jQuery, Backbone, Drupal);

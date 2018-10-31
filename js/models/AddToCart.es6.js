@@ -24,7 +24,7 @@
       return this.attributes['variations'][uuid]
     },
     getResolvedVariation(selectedAttributes) {
-      return Object.values(this.getVariations()).filter(variation => {
+      return Object.keys(this.getVariations()).map(key => this.getVariation(key)).filter(variation => {
         return this.getAttributes().every(attribute => {
           let fieldName = 'attribute_' + attribute.id;
           return variation.hasOwnProperty(fieldName) && (variation[fieldName].toString() === selectedAttributes[fieldName].toString());

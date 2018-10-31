@@ -37,19 +37,18 @@
     },
     addToCart: function addToCart() {
       var selectedVariation = this.model.getResolvedVariation(this.selectedAttributes);
-      fetch(Drupal.url('cart/add?_format=json'), {
-        credentials: 'include',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
+
+      $.ajax({
+        url: Drupal.url('cart/add?_format=json'),
         method: 'POST',
-        body: JSON.stringify([{
+        data: JSON.stringify([{
           purchased_entity_type: 'commerce_product_variation',
           purchased_entity_id: selectedVariation.variation_id,
           quantity: 1
-        }])
-      }).then(function (res) {}).then(function () {
+        }]),
+        contentType: 'application/json;',
+        dataType: 'json'
+      }).done(function () {
         Drupal.cartFlyout.fetchCarts();
         Drupal.cartFlyout.flyoutOffcanvasToggle();
       });
