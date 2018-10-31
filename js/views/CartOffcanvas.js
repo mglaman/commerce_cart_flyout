@@ -89,6 +89,7 @@
     onKeypress: function onKeypress(event) {
       if (event.keyCode === 13) {
         event.target.blur();
+        event.preventDefault();
       }
     },
     doUpdateCart: function doUpdateCart() {

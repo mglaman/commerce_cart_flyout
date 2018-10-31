@@ -92,6 +92,7 @@
           if (event.keyCode === 13) {
             // If the enter key was pressed, blur the element so that change and blur events execute.
             event.target.blur();
+            event.preventDefault();
           }
         },
         doUpdateCart() {
